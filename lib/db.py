@@ -11,7 +11,7 @@ class Database():
             try:
                 c = con.cursor()
                 c.execute("""CREATE TABLE IF NOT EXISTS Data
-                    (id INTEGER PRIMARY KEY, url TEXT, data TEXT, lastvisit INTEGER )
+                    (id INTEGER PRIMARY KEY, protocol TEXT, url TEXT, data TEXT, lastvisit INTEGER )
                 """)
             except Exception as e:
                 raise e
