@@ -1,10 +1,8 @@
 from bs4 import BeautifulSoup,SoupStrainer
 from urllib.parse import urljoin
-
+from tld import get_tld
 
 class Parser():
-    def __init__(self):
-        self.urls = []
 
     def urlExtractor(self, currentUrl: str, html: str) -> dict:
         href = {}
@@ -27,3 +25,6 @@ class Parser():
                         print(urljoin(currentUrl,url))
                         
         return href
+
+    def tldExtractor(self,url:str)-> str:
+        return get_tld(url, fail_silently=True)
