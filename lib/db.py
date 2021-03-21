@@ -5,8 +5,11 @@ class Database():
     def __init__(self,path:str):
         self.db_path = os.path.join(path,"db/db.sqlite")
 
-        con = sqlite3.connect(self.db_path)
-
+        try:
+            con = sqlite3.connect(self.db_path)
+        except:
+            os.touch(self.db_path)
+            
         if os.stat(self.db_path).st_size == 0:
             try:
                 c = con.cursor()
