@@ -1,9 +1,9 @@
 from lib.parser import Parser
 from lib.db import Database
-import os,requests,time,html,ast
+import os,requests,time,html,ast,urllib3
 import json
 
-urllib.disable_warnings()
+urllib3.disable_warnings()
 
 # constants
 PATH            = os.path.dirname(os.path.abspath(__file__))
