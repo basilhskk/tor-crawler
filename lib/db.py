@@ -14,14 +14,25 @@ class Database():
             try:
                 c = con.cursor()
                 c.execute("""CREATE TABLE IF NOT EXISTS Data
-                    (id INTEGER PRIMARY KEY, protocol TEXT, url TEXT UNIQUE, data TEXT, lastvisit INTEGER )
+                    ( protocol TEXT, url TEXT PRIMARY KEY UNIQUE, data TEXT, lastvisit INTEGER )
                 """)
             except Exception as e:
                 raise e
 
     def insert(self,data):
-        pass
-    
+        try:
+            con = sqlite3.connect(self.db_path)
+        except Exception as e:
+            raise e
+
+        try:
+            c = con.cursor()
+            c.execute(f"""INSERT INTO Data (protocol,url,data,lastvisit) VALUES ("{data['protocol']}","{data['url']}","{data['data']}",{data['lastvisit']}) """)
+            con.commit()
+            c.close()
+        except Exception as e:
+            raise e
+
     def select(self,query):
         pass
 
