@@ -27,9 +27,9 @@ class Parser():
                                 href[current_protocol].append(urljoin(currentUrl,url))
                             else:
                                 href[current_protocol] = [urljoin(currentUrl,url)]
-
             return href
-        except :
+        except Exception as e:
+            print(str(e))
             return href
 
     def tldExtractor(self,url:str)-> str:

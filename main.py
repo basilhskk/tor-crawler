@@ -60,9 +60,8 @@ def crawl(urloc:str) -> list:
                         if tld == "onion":
                             retUrls.append(url)
             return retUrls
-    except :
-        return []
-    finally:
+    except Exception as e:
+        print(str(e))
         return []
 
 if __name__ == "__main__":
@@ -76,8 +75,13 @@ if __name__ == "__main__":
     for url in urls:
 
         retUrls = crawl(url)
+
+        if not isinstance(retUrls,list):
+            print("here")
+            print(type(retUrls))
+            continue
         urls.extend(retUrls)
-        
+
         # keep only unique
         urls = list(set(urls))
         with open("urls.log","w")as f:
