@@ -7,10 +7,13 @@ Tor network crawler that saves URL and HTML in SQLite DB.
 
 ### Usage
 Install requirements
+
 `pip3 install -r requirements.txt`
+
 `sudo apt install tor`
 
 Run
+
 `sudo service tor start`
 
 `python3 main.py `
