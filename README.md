@@ -12,6 +12,7 @@ Install requirements
 
 Run
 `sudo service tor start`
+
 `python3 main.py `
 
 ## TODO
