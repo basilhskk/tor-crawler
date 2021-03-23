@@ -1,7 +1,6 @@
 # tor-crawler
 
-Tor network crawler that saves url and html in sqlite db.
-
+Tor network crawler that saves URL and HTML in SQLite DB.
 
 
 
