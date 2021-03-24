@@ -18,7 +18,7 @@ def connect_to_tor()-> requests.Session:
                     'https': 'socks5h://localhost:9050'}
     return session
 
-def crawl(urloc:str) -> list:
+def crawl(urloc:str) -> str,list:
     db      = Database(PATH)
     parser  = Parser()
     session = connect_to_tor()
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
         # keep only unique
         urls = list(set(urls))
-        
+
         #remove crawled url
         urls.remove(retulr)
 

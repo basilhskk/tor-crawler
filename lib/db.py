@@ -33,7 +33,7 @@ class Database():
         except Exception as e:
             raise e
 
-    def select(self,url:str):
+    def select(self,url:str) -> list:
         try:
             con = sqlite3.connect(self.db_path)
         except Exception as e:
