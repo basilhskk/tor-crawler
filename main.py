@@ -92,7 +92,6 @@ if __name__ == "__main__":
     for url in urls:
 
         retulr,retUrls = crawl(url)
-        print(retulr)
         
         if not isinstance(retUrls,list):
             continue
@@ -101,7 +100,10 @@ if __name__ == "__main__":
 
         # keep only unique
         urls = list(set(urls))
+        
+        #remove crawled url
         urls.remove(retulr)
+
         with open("urls.log","w")as f:
             json.dump({"urls":urls},f)
         print(f"Urls to be crawled: {len(urls)}")
