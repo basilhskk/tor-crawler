@@ -13,6 +13,11 @@ class Parser():
                 for link in BeautifulSoup(html, parse_only=SoupStrainer('a'),features="html.parser"):
                     if link.has_attr("href"):
                         url = link["href"]
+
+                        # check for id reference and remove it
+                        if url.contains("#") and url[0]!="#":
+                            url = url.split("#")[0]
+
                         if url[0] not in ["#","/"]:
                             try:
                                 protocol = url.split(":")[0]

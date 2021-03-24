@@ -8,7 +8,7 @@ urllib3.disable_warnings()
 # constants
 PATH            = os.path.dirname(os.path.abspath(__file__))
 # WARNING THIS URL MAY CHANGE
-STARTURL        = "http://zqktlwi4fecvo6ri.onion/wiki/index.php/Main_Page" #hidden wiki 
+STARTURL        = "http://zqktlwi4fecvo6ri.onion/wiki/index.php/Main_Page" #hidden wiki http://wiki5kauuihowqi5.onion/
 TORBUNDLEHEADER = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"}
 
 
@@ -77,9 +77,8 @@ if __name__ == "__main__":
         retUrls = crawl(url)
 
         if not isinstance(retUrls,list):
-            print("here")
-            print(type(retUrls))
             continue
+        
         urls.extend(retUrls)
 
         # keep only unique
