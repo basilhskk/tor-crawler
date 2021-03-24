@@ -21,6 +21,6 @@ Run
 ## TODO
 	
  - [ ] Remove crawled urls from list
- - [ ] Url parsing remove local paths (#id)
+ - [x] Url parsing remove local paths (#id)
  - [ ] Make it multithreaded
  - [ ] Index the db and make a simple search engine
