@@ -15,7 +15,7 @@ class Parser():
                         url = link["href"]
 
                         # check for id reference and remove it
-                        if url.contains("#") and url[0]!="#":
+                        if "#" in url and url[0]!="#":
                             url = url.split("#")[0]
 
                         if url[0] not in ["#","/"]:

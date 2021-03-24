@@ -1,7 +1,6 @@
 from lib.parser import Parser
 from lib.db import Database
-import os,requests,time,html,ast,urllib3
-import json
+import os,requests,time,html,ast,urllib3,json
 
 urllib3.disable_warnings()
 
@@ -10,8 +9,7 @@ PATH            = os.path.dirname(os.path.abspath(__file__))
 # WARNING THIS URL MAY CHANGE
 STARTURL        = "http://zqktlwi4fecvo6ri.onion/wiki/index.php/Main_Page" #hidden wiki http://wiki5kauuihowqi5.onion/
 TORBUNDLEHEADER = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"}
-
-
+global urls 
 
 #create tor session
 def connect_to_tor()-> requests.Session:
@@ -24,6 +22,20 @@ def crawl(urloc:str) -> list:
     db      = Database(PATH)
     parser  = Parser()
     session = connect_to_tor()
+    global urls
+    print("HEREEEEEE",urls)
+    # select here to find if in db 
+    try:
+        urlindb = db.select(urloc)
+        if len(urlindb) > 0:
+            print("url already crawled")
+            return urloc,[]
+        else:
+            print("her")
+    except Exception as e:
+        print(e)
+
+
     try:
         try:
             r = session.get(urloc,headers=TORBUNDLEHEADER)
@@ -45,7 +57,7 @@ def crawl(urloc:str) -> list:
                 # if urloc in db dont crawl it again and return
                 if "UNIQUE constraint failed" in str(e):
                     print("url already crawled")
-                    return []
+                    return urloc,[]
                 else:
                     print(str(e))
 
@@ -59,30 +71,37 @@ def crawl(urloc:str) -> list:
                         # crawl only onion sites
                         if tld == "onion":
                             retUrls.append(url)
-            return retUrls
+            return urloc, retUrls
     except Exception as e:
         print(str(e))
-        return []
+        return urloc,[]
 
 if __name__ == "__main__":
+    global urls
+
     urls = [STARTURL]
     # check if we have logged urls to crawl
-    with open("urls.log","r")as rf:
-        data = rf.read()
-        if len(data)>0 :
-            urls = json.loads(data)["urls"]
+    try:
+        with open("urls.log","r")as rf:
+            data = rf.read()
+            if len(data)>0 :
+                urls = json.loads(data)["urls"]
+    except:
+        os.mknod("urls.log")
 
     for url in urls:
 
-        retUrls = crawl(url)
-
+        retulr,retUrls = crawl(url)
+        print(retulr)
+        
         if not isinstance(retUrls,list):
             continue
-        
+
         urls.extend(retUrls)
 
         # keep only unique
         urls = list(set(urls))
+        urls.remove(retulr)
         with open("urls.log","w")as f:
             json.dump({"urls":urls},f)
         print(f"Urls to be crawled: {len(urls)}")

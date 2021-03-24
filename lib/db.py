@@ -19,7 +19,7 @@ class Database():
             except Exception as e:
                 raise e
 
-    def insert(self,data):
+    def insert(self,data:dict):
         try:
             con = sqlite3.connect(self.db_path)
         except Exception as e:
@@ -33,7 +33,22 @@ class Database():
         except Exception as e:
             raise e
 
-    def select(self,query):
-        pass
+    def select(self,url:str):
+        try:
+            con = sqlite3.connect(self.db_path)
+        except Exception as e:
+            raise e
+
+        try:
+            c = con.cursor()
+            c.execute(f"""SELECT url from Data WHERE url = '{url}' """)
+            rows = c.fetchall()
+            c.close()
+
+            return rows
+
+        except Exception as e:
+            raise e
+
 
     
