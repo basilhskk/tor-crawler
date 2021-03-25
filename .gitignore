@@ -8,3 +8,6 @@ __pycache__/
 .venv
 #custom 
 db/db.sqlite
+
+test/*
+test.py

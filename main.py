@@ -1,6 +1,9 @@
 from lib.parser import Parser
 from lib.db import Database
-import os,requests,time,html,ast,urllib3,json
+import os,requests,time,html,ast,urllib3,json,concurrent
+import concurrent.futures
+
+
 
 urllib3.disable_warnings()
 
@@ -9,7 +12,7 @@ PATH            = os.path.dirname(os.path.abspath(__file__))
 # WARNING THIS URL MAY CHANGE
 STARTURL        = "http://zqktlwi4fecvo6ri.onion/wiki/index.php/Main_Page" #hidden wiki http://wiki5kauuihowqi5.onion/
 TORBUNDLEHEADER = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"}
-global urls 
+ 
 
 #create tor session
 def connect_to_tor()-> requests.Session:
@@ -18,20 +21,17 @@ def connect_to_tor()-> requests.Session:
                     'https': 'socks5h://localhost:9050'}
     return session
 
-def crawl(urloc:str) -> str,list:
+def crawl(urloc:str) -> (str,list):
     db      = Database(PATH)
     parser  = Parser()
     session = connect_to_tor()
-    global urls
-    print("HEREEEEEE",urls)
+    
     # select here to find if in db 
     try:
         urlindb = db.select(urloc)
         if len(urlindb) > 0:
             print("url already crawled")
             return urloc,[]
-        else:
-            print("her")
     except Exception as e:
         print(e)
 
@@ -77,7 +77,7 @@ def crawl(urloc:str) -> str,list:
         return urloc,[]
 
 if __name__ == "__main__":
-    global urls
+    
 
     urls = [STARTURL]
     # check if we have logged urls to crawl
@@ -89,21 +89,23 @@ if __name__ == "__main__":
     except:
         os.mknod("urls.log")
 
-    for url in urls:
-
-        retulr,retUrls = crawl(url)
-        
-        if not isinstance(retUrls,list):
-            continue
-
-        urls.extend(retUrls)
-
-        # keep only unique
-        urls = list(set(urls))
-
-        #remove crawled url
-        urls.remove(retulr)
-
+    while len(urls)>0:
+        with concurrent.futures.ThreadPoolExecutor() as executor: # optimally defined number of threads
+            urls = [executor.submit(crawl, url) for url in urls]
+            concurrent.futures.wait(urls)
+        newUrls = []
+        for result in urls:
+            data = result.result()
+            if data[0] in data[1]:
+                # fix this
+                print(type(data[1]))
+                data[1].remove(data[0])
+            
+            if len(data[1])> 0 :
+                    newUrls.extend(data[1])
+        print(newUrls)
+        urls = newUrls
+        print("here looped")
         with open("urls.log","w")as f:
-            json.dump({"urls":urls},f)
-        print(f"Urls to be crawled: {len(urls)}")
+                json.dump({"urls":urls},f)
+            print(f"Urls to be crawled: {len(urls)}")
