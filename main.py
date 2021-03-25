@@ -25,7 +25,7 @@ def crawl(urloc:str) -> (str,list):
     db      = Database(PATH)
     parser  = Parser()
     session = connect_to_tor()
-    
+
     # select here to find if in db 
     try:
         urlindb = db.select(urloc)
@@ -91,22 +91,34 @@ if __name__ == "__main__":
 
     while len(urls)>0:
         
+        # multi threading function TPE default max workers == cpu count * 5
         with concurrent.futures.ThreadPoolExecutor() as executor: # optimally defined number of threads
             urls = [executor.submit(crawl, url) for url in urls]
             concurrent.futures.wait(urls)
         newUrls = []
         
         for result in urls:
-            data = result.result()
-            if data[0] in data[1]:
-                # fix this
-                data[1].remove(data[0])
-            
-            if len(data[1])> 0 :
-                    newUrls.extend(data[1])
-        
+            try:
+                data = result.result()
+               
+                if data[0] != None:
+                    
+                    if data[0] != None:
+                        # fix this
+                        try:
+                            data[1].remove(data[0])
+                            newUrls.remove(data[0])
+                        except:
+                            pass
+
+                if len(data[1])> 0 :
+                        newUrls.extend(data[1])
+            except:
+                pass
+
         urls = newUrls
 
+        # save urls log in case of unexpected exit
         with open("urls.log","w")as f:
                 json.dump({"urls":urls},f)
-            print(f"Urls to be crawled: {len(urls)}")
+        print(f"Urls to be crawled: {len(urls)}")
