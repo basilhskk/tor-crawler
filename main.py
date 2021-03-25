@@ -90,22 +90,23 @@ if __name__ == "__main__":
         os.mknod("urls.log")
 
     while len(urls)>0:
+        
         with concurrent.futures.ThreadPoolExecutor() as executor: # optimally defined number of threads
             urls = [executor.submit(crawl, url) for url in urls]
             concurrent.futures.wait(urls)
         newUrls = []
+        
         for result in urls:
             data = result.result()
             if data[0] in data[1]:
                 # fix this
-                print(type(data[1]))
                 data[1].remove(data[0])
             
             if len(data[1])> 0 :
                     newUrls.extend(data[1])
-        print(newUrls)
+        
         urls = newUrls
-        print("here looped")
+
         with open("urls.log","w")as f:
                 json.dump({"urls":urls},f)
             print(f"Urls to be crawled: {len(urls)}")
