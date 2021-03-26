@@ -109,7 +109,6 @@ if __name__ == "__main__":
                 if data[0] != None:
                     
                     if data[0] != None:
-                        # fix this
                         try:
                             data[1].remove(data[0])
                             newUrls.remove(data[0])
