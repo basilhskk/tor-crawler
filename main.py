@@ -53,7 +53,7 @@ def crawl(urloc:str) -> (str,list):
             "data"     : base64.b64encode(r.content),
             "lastvisit": int(time.time()),
             }
-            print(r.content)
+            
             try:
                 db.insert(insert_data)
             except Exception as e:
