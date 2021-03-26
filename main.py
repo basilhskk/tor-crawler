@@ -1,6 +1,6 @@
 from lib.parser import Parser
 from lib.db import Database
-import os,requests,time,html,ast,urllib3,json,concurrent
+import os,requests,time,html,ast,urllib3,json,base64
 import concurrent.futures
 
 
@@ -10,7 +10,9 @@ urllib3.disable_warnings()
 # constants
 PATH            = os.path.dirname(os.path.abspath(__file__))
 # WARNING THIS URL MAY CHANGE
-STARTURL        = "http://zqktlwi4fecvo6ri.onion/wiki/index.php/Main_Page" #hidden wiki http://wiki5kauuihowqi5.onion/
+WIKI            = "http://zqktlwi4fecvo6ri.onion/wiki/index.php/Main_Page" #hidden wiki
+URLLISTING      = "http://dirnxxdraygbifgc.onion/" # url listing site
+OLDWIKI         = "http://wiki5kauuihowqi5.onion/" # onion wiki old
 TORBUNDLEHEADER = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0"}
  
 
@@ -31,10 +33,10 @@ def crawl(urloc:str) -> (str,list):
         urlindb = db.select(urloc)
         if len(urlindb) > 0:
             print("url already crawled")
+            del urlindb
             return urloc,[]
     except Exception as e:
         print(e)
-
 
     try:
         try:
@@ -48,9 +50,10 @@ def crawl(urloc:str) -> (str,list):
             insert_data = {
             "protocol" : protocol,
             "url"      : urloc,
-            "data"     : html.escape(r.text),
+            "data"     : base64.b64encode(r.content),
             "lastvisit": int(time.time()),
             }
+            print(r.content)
             try:
                 db.insert(insert_data)
             except Exception as e:
@@ -76,10 +79,11 @@ def crawl(urloc:str) -> (str,list):
         print(str(e))
         return urloc,[]
 
+
 if __name__ == "__main__":
     
-
-    urls = [STARTURL]
+    db   = Database(PATH)
+    urls = [WIKI,URLLISTING,OLDWIKI]
     # check if we have logged urls to crawl
     try:
         with open("urls.log","r")as rf:
@@ -95,6 +99,7 @@ if __name__ == "__main__":
         with concurrent.futures.ThreadPoolExecutor() as executor: # optimally defined number of threads
             urls = [executor.submit(crawl, url) for url in urls]
             concurrent.futures.wait(urls)
+        
         newUrls = []
         
         for result in urls:
@@ -117,6 +122,17 @@ if __name__ == "__main__":
                 pass
 
         urls = newUrls
+        del newUrls
+
+        # for each url check if in db
+        for url in urls:
+            try:
+                urlindb = db.select(url)
+                if len(urlindb) > 0:
+                    urls.remove(url)
+                    del urlindb
+            except:
+                pass
 
         # save urls log in case of unexpected exit
         with open("urls.log","w")as f:
