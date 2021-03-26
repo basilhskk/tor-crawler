@@ -40,10 +40,23 @@ def crawl(urloc:str) -> (str,list):
 
     try:
         try:
-            r = session.get(urloc,headers=TORBUNDLEHEADER)
+            r = session.get(urloc,headers=TORBUNDLEHEADER,timeout=20)
             r.raise_for_status()
+
         except Exception as err:
-            print(f'Other error occurred: {err}')  # Python 3.6
+            insert_data = {
+            "protocol" : "Error",
+            "url"      : urloc,
+            "data"     : base64.b64encode(str(err).encode()),
+            "lastvisit": int(time.time()),
+            }
+
+            try:
+                db.insert(insert_data)
+            except Exception as e:
+                # if urloc in db dont crawl it again and return
+                print(str(e))
+        
         else:
             urls = parser.urlExtractor(urloc,r.text)
             protocol = urloc.split("://")[0]
@@ -58,11 +71,7 @@ def crawl(urloc:str) -> (str,list):
                 db.insert(insert_data)
             except Exception as e:
                 # if urloc in db dont crawl it again and return
-                if "UNIQUE constraint failed" in str(e):
-                    print("url already crawled")
-                    return urloc,[]
-                else:
-                    print(str(e))
+                print(str(e))
 
 
             retUrls = []
@@ -75,6 +84,7 @@ def crawl(urloc:str) -> (str,list):
                         if tld == "onion":
                             retUrls.append(url)
             return urloc, retUrls
+
     except Exception as e:
         print(str(e))
         return urloc,[]
@@ -122,16 +132,6 @@ if __name__ == "__main__":
 
         urls = newUrls
         del newUrls
-
-        # for each url check if in db
-        for url in urls:
-            try:
-                urlindb = db.select(url)
-                if len(urlindb) > 0:
-                    urls.remove(url)
-                    del urlindb
-            except:
-                pass
 
         # save urls log in case of unexpected exit
         with open("urls.log","w")as f:
