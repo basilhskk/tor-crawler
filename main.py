@@ -142,7 +142,7 @@ if __name__ == "__main__":
                 "lastvisit": 0,
                 }
 
-                db.insert(insert_data)
+                db.insert2(insert_data)
             except Exception as e: 
                 print(str(e))
 

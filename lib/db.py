@@ -21,6 +21,7 @@ class Database():
             except Exception as e:
                 raise e
 
+
     def insert(self,data:dict):
         c=None
         con=None
@@ -39,6 +40,26 @@ class Database():
             if con:
                 con.close()
 
+
+    def insert2(self,data:dict):
+        c=None
+        con=None
+        try:
+            con = sqlite3.connect(self.db_path, check_same_thread=False)
+
+            c = con.cursor()
+            c.execute(f"""INSERT INTO Data (protocol,url,data,lastvisit) VALUES ("{data['protocol']}","{data['url']}","{data['data']}",{data['lastvisit']}) """)
+            con.commit()
+        except Exception as e:
+            raise e
+        finally:
+            if c :
+                c.close()
+            if con:
+                con.close()
+
+
+
     def update(self,data:dict):
         c=None
         con=None
@@ -56,6 +77,7 @@ class Database():
                 c.close()
             if con:
                 con.close()
+
 
     def isCrawled(self,url:str) -> list:
         c=None
